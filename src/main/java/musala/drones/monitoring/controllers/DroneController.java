@@ -1,11 +1,12 @@
 package musala.drones.monitoring.controllers;
 
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
+import jakarta.validation.Valid;
 import musala.drones.monitoring.configuration.ControllerURLs;
 import musala.drones.monitoring.dto.DroneDto;
 import musala.drones.monitoring.dto.MedicationDto;
@@ -21,25 +22,27 @@ import java.util.List;
 /**
  * Drones API
  */
+
 @RequestMapping(ControllerURLs.DRONES_URL)
+@Validated
 public interface DroneController {
     /**
      * registering a drone
      */
     @PostMapping(REGISTER_DRONE)
-    void registerDrone(@RequestBody DroneDto drone);
+    void registerDrone(@RequestBody @Valid DroneDto drone);
 
     /**
      * loading a drone with medication items
      */
-    @PutMapping(LOAD_DRONE_WITH_MEDICATION)
-    void loadDroneWithMedications(@PathVariable(DRONE_ID) String droneId, @RequestBody List<MedicationDto> medications);
+    @PutMapping("/{droneId}" + LOAD_DRONE_WITH_MEDICATION)
+    void loadDroneWithMedications(@PathVariable String droneId, @RequestBody @Valid List<MedicationDto> medications);
 
     /**
      * checking loaded medication items for a given drone
      */
-    @GetMapping(GET_LOADED_MEDICATIONS)
-    List<MedicationDto> getLoadedMedications(@PathVariable(DRONE_ID) String droneId);
+    @GetMapping("/{droneId}" + GET_LOADED_MEDICATIONS)
+    List<MedicationDto> getLoadedMedications(@PathVariable String droneId);
 
     /**
      * checking available drones for loading
@@ -51,6 +54,6 @@ public interface DroneController {
     /**
      * check drone battery level for a given drone
      */
-    @GetMapping(GET_BATTERY_LEVEL)
-    int getBatteryLevel(@PathVariable(DRONE_ID) String droneId);
+    @GetMapping("/{droneId}" + GET_BATTERY_LEVEL)
+    int getBatteryLevel(@PathVariable String droneId);
 }
