@@ -15,21 +15,21 @@ import static musala.drones.monitoring.dto.DroneState.*;
 @Data
 public class DroneDto
 {
-    @NotBlank(message = DRONE_ID_WRONG_LENGTH)
-    @Size(max = DRONE_ID_LENGTH_MAX, message = DRONE_ID_WRONG_LENGTH)
+    @NotBlank(message = DRONE_ID_WRONG_LENGTH_MESSAGE)
+    @Size(max = DRONE_ID_LENGTH_MAX, message = DRONE_ID_WRONG_LENGTH_MESSAGE)
     String serialNumber;// (100 characters max);
 
-    @NotNull(message = WRONG_DRONE_MODEL)
+    @NotNull(message = WRONG_DRONE_MODEL_MESSAGE)
     DroneModel model;
 
-    @NotNull(message = WRONG_WEIGHT_LIMIT)
-    @Positive(message = WRONG_WEIGHT_LIMIT)
-    @Max(value = WEIGHT_LIMIT_MAX, message = WRONG_WEIGHT_LIMIT)
+    @NotNull(message = WRONG_WEIGHT_LIMIT_MESSAGE)
+    @PositiveOrZero(message = WRONG_WEIGHT_LIMIT_MESSAGE)
+    @Max(value = WEIGHT_LIMIT_MAX, message = WRONG_WEIGHT_LIMIT_MESSAGE)
     int weightLimit; //grams
 
-    @NotNull(message = WRONG_BATTERY_CAPACITY)
-    @Positive(message = WRONG_BATTERY_CAPACITY)
-    @Max(value = 100, message = WRONG_BATTERY_CAPACITY)
+    @NotNull(message = WRONG_BATTERY_CAPACITY_MESSAGE)
+    @PositiveOrZero(message = WRONG_BATTERY_CAPACITY_MESSAGE)
+    @Max(value = 100, message = WRONG_BATTERY_CAPACITY_MESSAGE)
     int batteryCapacity;// percentage;
 
     DroneState state = IDLE;

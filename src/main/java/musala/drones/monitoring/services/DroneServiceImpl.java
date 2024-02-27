@@ -11,8 +11,8 @@ import java.util.List;
 public class DroneServiceImpl implements DroneService {
 
     @Override
-    public void registerDrone(DroneDto drone) {
-
+    public DroneDto registerDrone(DroneDto drone) {
+       return drone;
     }
     @Override
     public void loadDroneWithMedications(String droneId, List<MedicationDto> medications) {

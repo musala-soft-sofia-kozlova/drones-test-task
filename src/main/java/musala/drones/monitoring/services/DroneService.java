@@ -7,7 +7,7 @@ import musala.drones.monitoring.dto.MedicationDto;
 
 
 public interface DroneService {
-    public void registerDrone(DroneDto drone);
+    public DroneDto registerDrone(DroneDto drone);
     public void loadDroneWithMedications(String droneId, List<MedicationDto> medications);
     public List<MedicationDto> getLoadedMedications(String droneId);
     public List<String> getAvailableDrones();

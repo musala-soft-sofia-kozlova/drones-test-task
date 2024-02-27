@@ -7,7 +7,7 @@ import musala.exceptions.NotFoundException;
 public class DroneNotFoundException extends NotFoundException {
 
 	public DroneNotFoundException() {
-		super(ServiceExceptionMessages.DRONE_NOT_FOUND);
+		super(ServiceExceptionMessages.DRONE_NOT_FOUND_MESSAGE);
 		
 	}
 

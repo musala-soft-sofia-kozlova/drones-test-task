@@ -20,9 +20,9 @@ public class DroneControllerImpl implements DroneController {
     private DroneService droneService;
 
 	@Override
-	public void registerDrone(DroneDto drone) {
+	public DroneDto registerDrone(DroneDto drone) {
 		log.debug("DroneControllerImpl::registerDrone: {}", drone);
-		droneService.registerDrone(drone);
+		return droneService.registerDrone(drone);
 	}
 
 	@Override

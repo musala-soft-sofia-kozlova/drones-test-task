@@ -30,7 +30,7 @@ public interface DroneController {
      * registering a drone
      */
     @PostMapping(REGISTER_DRONE)
-    void registerDrone(@RequestBody @Valid DroneDto drone);
+    DroneDto registerDrone(@RequestBody @Valid DroneDto drone);
 
     /**
      * loading a drone with medication items
