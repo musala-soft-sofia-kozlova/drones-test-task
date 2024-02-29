@@ -26,10 +26,9 @@ public class DroneControllerImpl implements DroneController {
 	}
 
 	@Override
-	public void loadDroneWithMedications(String droneId, List<MedicationDto> medications) {
+	public long loadDroneWithMedications(String droneId, List<MedicationDto> medications) {
 		log.debug("DroneControllerImpl::loadDroneWithMedications: {} {}", droneId, medications);
-		droneService.loadDroneWithMedications(droneId, medications);
-
+		return droneService.loadDroneWithMedications(droneId, medications);
 	}
 
 	@Override

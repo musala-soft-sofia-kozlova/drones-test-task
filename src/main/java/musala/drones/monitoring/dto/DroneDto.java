@@ -19,9 +19,6 @@ public class DroneDto
     @Size(max = DRONE_ID_LENGTH_MAX, message = DRONE_ID_WRONG_LENGTH_MESSAGE)
     String serialNumber;// (100 characters max);
 
-    @NotNull(message = WRONG_DRONE_MODEL_MESSAGE)
-    DroneModel model;
-
     @NotNull(message = WRONG_WEIGHT_LIMIT_MESSAGE)
     @PositiveOrZero(message = WRONG_WEIGHT_LIMIT_MESSAGE)
     @Max(value = WEIGHT_LIMIT_MAX, message = WRONG_WEIGHT_LIMIT_MESSAGE)
@@ -33,4 +30,8 @@ public class DroneDto
     int batteryCapacity;// percentage;
 
     DroneState state = IDLE;
+
+    DroneModel getModelByWeight() {
+        return DroneModel.getModelByWeight(weightLimit);
+    }
 }

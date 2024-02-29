@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class LogDto
+public class LogDroneStateRecordDto
 {
     @NotBlank(message = DRONE_ID_WRONG_LENGTH_MESSAGE)
     @Size(max = DRONE_ID_LENGTH_MAX, message = DRONE_ID_WRONG_LENGTH_MESSAGE)

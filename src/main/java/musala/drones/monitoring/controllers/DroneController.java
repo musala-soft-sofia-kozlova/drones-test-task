@@ -34,9 +34,10 @@ public interface DroneController {
 
     /**
      * loading a drone with medication items
+     * @return flight_id
      */
     @PutMapping("/{droneId}" + LOAD_DRONE_WITH_MEDICATION)
-    void loadDroneWithMedications(@PathVariable String droneId, @RequestBody @Valid List<MedicationDto> medications);
+    long loadDroneWithMedications(@PathVariable String droneId, @RequestBody @Validated List<@Valid MedicationDto> medications);
 
     /**
      * checking loaded medication items for a given drone
