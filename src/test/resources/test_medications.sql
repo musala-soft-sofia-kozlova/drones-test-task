@@ -1,7 +1,7 @@
 delete from "drone-states-log";
+delete from "flights-log";
 delete from medications;
 delete from drones;
-delete from "flights-log";
 insert into medications (code, name, weight)
 	values
 		('MED_CODE_1', 'MED-NAME-1', 100),

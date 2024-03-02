@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import musala.drones.monitoring.dto.DroneState;
 import musala.drones.monitoring.entities.DroneEntity;
 import musala.drones.monitoring.entities.LogDroneStateRecordEntity;
@@ -22,6 +22,7 @@ import static musala.drones.monitoring.dto.DroneState.*;
 
 @EnableScheduling
 @Configuration
+@Slf4j
 public class PeriodicLog {
 
     @Autowired
@@ -37,7 +38,7 @@ public class PeriodicLog {
 		res.put(LOADED, DELIVERING);
 		res.put(DELIVERING, DELIVERED);
 		res.put(DELIVERED, RETURNING);
-		res.put(DELIVERED, IDLE);
+		res.put(RETURNING, IDLE);
 		return res;
 	}
 
@@ -56,6 +57,7 @@ public class PeriodicLog {
                 .timestamp(LocalDateTime.now())
                 .build();
 
+		log.debug("PeriodicLog::createLogRecord: {} {}", drone.getSerialNumber(), drone.getState());
 		logRepo.save(eventLog);
 	}
 }

@@ -38,7 +38,6 @@ public class DroneEntity {
     DroneState state;
 
     @OneToOne
-    @JoinColumn(name = "flight_id")
     FlightRecordEntity current_flight;
 
     public static DroneEntity of(DroneDto droneDto) {

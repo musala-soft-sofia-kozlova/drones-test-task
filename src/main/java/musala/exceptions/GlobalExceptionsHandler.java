@@ -8,10 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import jakarta.servlet.ServletException;
+import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
@@ -49,5 +52,30 @@ public class GlobalExceptionsHandler {
 		log.error(body);
 		return new ResponseEntity<>(body, status);
 	}
+
+	    @ExceptionHandler({NullPointerException.class})
+	    public ResponseEntity<String> handleNullPointerException(NullPointerException e){
+	    	String message = e.getMessage();
+			return errorResponse(message, HttpStatus.NOT_FOUND);
+	    }
+
+	    @ExceptionHandler({ServletException.class})
+	    public ResponseEntity<String> handleMethodArgumentNotValidException(ServletException e){
+	    	String message = e.getMessage();
+			return errorResponse(message, HttpStatus.NOT_FOUND);
+	    }
+
+
+	    @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
+	    public ResponseEntity<String> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e){
+	    	String message = e.getMessage();
+			return errorResponse(message, HttpStatus.NOT_FOUND);
+	    }
+
+	    @ExceptionHandler( {UnexpectedTypeException.class})
+	    public ResponseEntity<String> handleHttpMediaTypeNotSupportedException( UnexpectedTypeException e){
+	    	String message = e.getMessage();
+			return errorResponse(message, HttpStatus.NOT_FOUND);
+	    }
 
 }

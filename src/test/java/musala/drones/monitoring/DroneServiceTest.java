@@ -5,15 +5,20 @@ import musala.drones.monitoring.entities.*;
 import musala.drones.monitoring.exceptions.*;
 import musala.drones.monitoring.repository.*;
 import musala.drones.monitoring.services.DroneService;
+import musala.drones.monitoring.services.DroneServiceImpl;
 
 import static musala.drones.monitoring.TestDisplayNames.*;
+import static musala.drones.monitoring.dto.DroneState.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +27,7 @@ import java.util.List;
 @SpringBootTest
 @Sql(scripts = "classpath:test_medications.sql")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Slf4j
 class DroneServiceTest {
 	private static final String DRONE_ID = "DRONE-1";
 	private static final String DRONE_ID_NOT_FOUND = "DRONE-111";
@@ -43,8 +49,17 @@ class DroneServiceTest {
 	MedicationsRepository medicationsRepo;
 	@Autowired
 	FlightRecordRepository flightRecordRepo;
+	@Autowired
+	LogDroneStateRecordsRepository logRepo;
+	
+    @Value("${app.periodic.log.unit.milliseconds}")
+    int logTimePeriod;
+    
+	@Autowired
+    private DroneServiceDynamicConfiguration configuration;
 
 	@BeforeEach
+	@Transactional
 	public void setUp() throws Exception {
 		droneDto = new DroneDto(DRONE_ID, 500, 100, DroneState.IDLE);
 
@@ -130,6 +145,7 @@ class DroneServiceTest {
 
 	// wrong scenarios
 	@Test
+	@Order(6)
 	@DisplayName(SERVICE_TEST + REGISTER_DRONE_TEST + " Drone Already Registered")
 	void registerDroneTestDroneAlreadyRegistered() {
 		droneService.registerDrone(droneDto);
@@ -137,6 +153,7 @@ class DroneServiceTest {
 	}
 
 	@Test
+	@Order(7)
 	@DisplayName(SERVICE_TEST + LOAD_DRONE_WITH_MEDICATION_TEST + " Drone Not Found")
 	void loadDroneWithMedicationsTestDroneNotFound() {
 		assertThrowsExactly(DroneNotFoundException.class,
@@ -144,6 +161,7 @@ class DroneServiceTest {
 	}
 
 	@Test
+	@Order(8)
 	@Transactional
 	@DisplayName(SERVICE_TEST + LOAD_DRONE_WITH_MEDICATION_TEST + " Illegal State")
 	void loadDroneWithMedicationsTestIllegalState() {
@@ -154,6 +172,7 @@ class DroneServiceTest {
 	}
 
 	@Test
+	@Order(9)
 	@DisplayName(SERVICE_TEST + LOAD_DRONE_WITH_MEDICATION_TEST + " Low battery capacity")
 	void loadDroneWithMedicationsTestLowBatteryCapacity() {
 		droneDto.setBatteryCapacity(10);
@@ -163,6 +182,7 @@ class DroneServiceTest {
 	}
 
 	@Test
+	@Order(10)
 	@DisplayName(SERVICE_TEST + LOAD_DRONE_WITH_MEDICATION_TEST + " Medication Not Found")
 	void loadDroneWithMedicationsTestMedicationNotFound() {
 		droneService.registerDrone(droneDto);
@@ -172,6 +192,7 @@ class DroneServiceTest {
 	}
 
 	@Test
+	@Order(11)
 	@DisplayName(SERVICE_TEST + LOAD_DRONE_WITH_MEDICATION_TEST + " Weight Exceeded")
 	void loadDroneWithMedicationsTestWeightExceeded() {
 		droneService.registerDrone(droneDto);
@@ -181,14 +202,59 @@ class DroneServiceTest {
 	}
 
 	@Test
+	@Order(12)
 	@DisplayName(SERVICE_TEST + GET_LOADED_MEDICATIONS_TEST + " Drone Not Found")
 	void getLoadedMedicationsTestDroneNotFound() {
 		assertThrowsExactly(DroneNotFoundException.class, () -> droneService.getLoadedMedications(DRONE_ID_NOT_FOUND));
 	}
 
 	@Test
+	@Order(13)
 	@DisplayName(SERVICE_TEST + GET_BATTERY_LEVEL_TEST + " Drone Not Found")
 	void getBatteryLevelTestDroneNotFound() {
 		assertThrowsExactly(DroneNotFoundException.class, () -> droneService.getBatteryLevel(DRONE_ID_NOT_FOUND));
 	}
+	
+	
+	@Test
+	void dynamicTest() throws Exception {
+		setUp();
+		configuration.startPeriodicalTask();
+		try {
+			List<LogDroneStateRecordEntity> logRecords = logRepo.findAll();
+			assertEquals(0, logRecords.size());
+			droneService.registerDrone(droneDto);
+			Thread.sleep(logTimePeriod);
+			logRecords = logRepo.findAll();
+			DroneEntity drone = dronesRepo.findById(DRONE_ID).orElse(null);
+			assertNotNull(drone);
+			assertEquals(drone.getState(), IDLE);
+			
+			droneService.loadDroneWithMedications(DRONE_ID, medicationList);
+			
+			
+			Thread.sleep(logTimePeriod * 10); // IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING
+			drone = dronesRepo.findById(DRONE_ID).orElse(null);
+			assertEquals(IDLE, drone.getState());
+			logRecords = logRepo.findAll();
+			assertEquals(IDLE, logRecords.get(logRecords.size() - 1).getState());
+			configuration.stopPeriodicalTask();
+			
+			int i = 0;
+			for (i = 0; i < logRecords.size(); i++) {
+				if (logRecords.get(i).getState() == IDLE)
+					continue;
+				break;
+			}
+			assertEquals(logRecords.get(++i).getState(), LOADED);
+			assertEquals(logRecords.get(++i).getState(), DELIVERING);
+			assertEquals(logRecords.get(++i).getState(), DELIVERED);
+			assertEquals(logRecords.get(++i).getState(), RETURNING);
+			assertEquals(logRecords.get(++i).getState(), IDLE);
+			assertEquals(logRecords.get(++i).getState(), IDLE);
+			
+		} catch (InterruptedException e) {
+		}
+	}
+
 }
