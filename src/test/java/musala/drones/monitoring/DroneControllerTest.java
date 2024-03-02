@@ -35,6 +35,8 @@ import musala.drones.monitoring.dto.DroneDto;
 import musala.drones.monitoring.services.DroneService;
 import musala.exceptions.GlobalExceptionsHandler;
 import musala.drones.monitoring.exceptions.DroneNotFoundException;
+import musala.drones.monitoring.repository.DronesRepository;
+import musala.drones.monitoring.repository.LogDroneStateRecordsRepository;
 
 import static musala.drones.monitoring.TestDisplayNames.*;
 import static musala.drones.monitoring.configuration.ControllerURLs.*;
@@ -56,6 +58,12 @@ class DroneControllerTest {
 
 	@MockBean
 	DroneService droneService;
+
+	@MockBean
+	private DronesRepository dronesRepo;
+
+	@MockBean
+	private LogDroneStateRecordsRepository logRepo;
 
 	@Autowired
 	ObjectMapper mapper;
@@ -187,8 +195,21 @@ class DroneControllerTest {
 	////////////////////// getLoadedMedicationsTest
 
 	@Test
-	@DisplayName(CONTROLLER_TEST + GET_LOADED_MEDICATIONS_TEST)
-	void getLoadedMedicationsTest() throws Exception {
+	@DisplayName(CONTROLLER_TEST + GET_LOADED_MEDICATIONS_TEST + " good")
+	void getLoadedMedicationsTestGood() throws Exception {
+		when(droneService.getLoadedMedications(DRONE_ID)).thenReturn(medicationList);
+		String returnedJSON = mapper.writeValueAsString(medicationList);
+		String response = getRequest(HOST + DRONES_URL + "//" + DRONE_ID + GET_LOADED_MEDICATIONS, 200);
+		assertEquals(returnedJSON, response);
+	}
+
+	@Test
+	@DisplayName(CONTROLLER_TEST + GET_LOADED_MEDICATIONS_TEST + " Drone Not Found")
+	void getLoadedMedicationsTestDroneNotFound() throws Exception {
+		when(droneService.getLoadedMedications(DRONE_ID_NOT_FOUND)).thenThrow(new DroneNotFoundException());
+		String response = getRequest(HOST + DRONES_URL + "//" + DRONE_ID_NOT_FOUND + GET_LOADED_MEDICATIONS, 404);
+		assertEquals(DRONE_NOT_FOUND_MESSAGE, response);
+		verify(droneService, times(1)).getLoadedMedications(any());
 	}
 
 	////////////////////// getAvailableDronesTest

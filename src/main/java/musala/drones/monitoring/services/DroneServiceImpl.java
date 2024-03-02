@@ -27,7 +27,7 @@ public class DroneServiceImpl implements DroneService {
     @Autowired
     FlightRecordRepository logDroneLoadRecordRepo;
 
-    @Value("${app.battery.capacity.LOW_BATTERY_CAPACITY:25}")
+    @Value("${app.battery.capacity.low_battery_capacity:25}")
     int lowBatteryCapacity;
 
     @Override
@@ -64,8 +64,8 @@ public class DroneServiceImpl implements DroneService {
             MedicationEntity medicationEntity = medicationsRepo.findById(medicationDto.getCode())
                     .orElseThrow(() -> new MedicationNotFoundException());
 
-            weight += medicationEntity.getWeight();
-            if (droneWeightLimit < weight)
+            weight += medicationDto.getWeight();
+            if (weight > droneWeightLimit)
                 throw new MedicationWeightExceededException();
 
             flightLogEntity.medications.add(medicationEntity);

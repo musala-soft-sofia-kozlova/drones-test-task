@@ -41,16 +41,16 @@ public class DroneEntity {
     @JoinColumn(name = "flight_id")
     FlightRecordEntity current_flight;
 
-    public void setBatteryCapacity(byte batteryCapacity) {
-        this.batteryCapacity = batteryCapacity;
-    }
-    public void setState(DroneState state) {
-        this.state = state;
-    }
-
     public static DroneEntity of(DroneDto droneDto) {
         return new DroneEntity(droneDto.getSerialNumber(),
                 droneDto.getWeightLimit(),
                 droneDto.getBatteryCapacity(), droneDto.getState(), null);
+    }
+    
+    public static DroneDto to(DroneEntity droneEntity) {
+        return new DroneDto(droneEntity.getSerialNumber(), 
+        		droneEntity.getWeightLimit(),
+        		droneEntity.getBatteryCapacity(), 
+        		droneEntity.getState());
     }
 }

@@ -1,14 +1,20 @@
 package musala.drones.monitoring.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import musala.drones.monitoring.dto.DroneState;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "drone-states-log")
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
+@Builder
 public class LogDroneStateRecordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
