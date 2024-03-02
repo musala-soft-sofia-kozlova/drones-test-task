@@ -31,6 +31,7 @@ public class DroneServiceDynamicConfiguration {
     private final SystemService systemService;
     
     private Thread periodicalTaskThread;
+    private volatile boolean stopPeriodicalTask = false;
     
     @Value("${app.periodic.log.unit.milliseconds}")
     int logTimePeriod;
@@ -61,22 +62,22 @@ public class DroneServiceDynamicConfiguration {
 	
 	void startPeriodicalTask()	{
 		periodicalTaskThread = new Thread(() -> {
-			while(true) {
-				try {
-					Thread.sleep(logTimePeriod);
-				} catch (InterruptedException e) {
-
-				}
-				log.debug("Test: periodicTask");
-				periodicTask();
-			}
-		});
-		periodicalTaskThread.setDaemon(true);
-		periodicalTaskThread.start();
+	        while (!stopPeriodicalTask) {
+	            try {
+	                Thread.sleep(logTimePeriod);
+	            } catch (InterruptedException e) {
+	                Thread.currentThread().interrupt();
+	            }
+	            log.debug("Test: periodicTask");
+	            periodicTask();
+	        }
+	    });
+	    periodicalTaskThread.setDaemon(true);
+	    periodicalTaskThread.start();
 	}
 	
 	void stopPeriodicalTask() {
-		periodicalTaskThread.stop();
+		stopPeriodicalTask = true;
 	}
 
 	private void droneProcessing(DroneEntity drone) {
